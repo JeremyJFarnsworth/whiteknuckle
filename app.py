@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
@@ -100,7 +100,7 @@ def send_email():
         name = post_data.get('name')
         email = post_data.get('email')
         message = post_data.get('message')
-        
+
         if name == None or name == "" or email == None or email == "" or message == None or message == "":
             return json.dumps(str("Please provide a name, email and message to send email!")), 400
 

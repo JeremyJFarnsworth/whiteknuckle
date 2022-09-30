@@ -115,7 +115,7 @@ def send_email():
     print(response.status_code)
     print(response.body)
     print(response.headers)
-    return response
+    return jsonify("you successfully sent an email")
 
 # def build_preflight_response():
 #     response = make_response()

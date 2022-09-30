@@ -3,8 +3,7 @@ from flask import Flask, request, jsonify, make_response, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
-# import os
-# import sys
+import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
 from werkzeug.exceptions import HTTPException
@@ -116,7 +115,6 @@ def send_email():
         print(response.status_code)
         print(response.body)
         print(response.headers)
-        print('Hello world!', file=sys.stderr)
         return response
 
 def build_preflight_response():

@@ -3,8 +3,8 @@ from flask import Flask, request, jsonify, make_response, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
-import os
-import sys
+# import os
+# import sys
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import *
 from werkzeug.exceptions import HTTPException
@@ -13,8 +13,9 @@ app = Flask(__name__)
 CORS(app)
 
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
+app.config["SQLALCHEMY_DATABASE_URI"] = 
 
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
@@ -130,3 +131,6 @@ def build_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add('Content-Type', "application/json")
     return response
+
+if __name__ == "__main__":
+    app.run(debug=True)

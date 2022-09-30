@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request, jsonify, make_response
+from flask import Flask, request, jsonify, make_response, Response
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
@@ -11,7 +11,7 @@ from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
@@ -123,8 +123,10 @@ def build_preflight_response():
     response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers.add('Access-Control-Allow-Headers', "*")
     response.headers.add('Access-Control-Allow-Methods', "*")
+    response.headers.add('Content-Type', "application/json")
     return response
 
 def build_actual_response(response):
     response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Content-Type', "application/json")
     return response

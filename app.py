@@ -2,7 +2,7 @@ import json
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 import os
 import sys
 from sendgrid import SendGridAPIClient
@@ -11,6 +11,7 @@ from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
@@ -86,6 +87,7 @@ def handle_exception(e):
 
 
 @app.route("/send_email", methods=['OPTIONS','POST'])
+@cross_origin()
 def send_email():
     if request.method == 'OPTIONS': 
         return build_preflight_response()

@@ -1,5 +1,5 @@
 import json
-from flask import Flask, request, jsonify, make_response, Response
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_cors import CORS, cross_origin
@@ -86,49 +86,49 @@ def handle_exception(e):
     return response
 
 
-@app.route("/send_email", methods=['OPTIONS','POST'])
+@app.route("/send_email", methods=['POST'])
 @cross_origin(["https://whiteknucklereact.vercel.app"])
 def send_email():
-    if request.method == 'OPTIONS': 
-        return build_preflight_response()
-    elif request.method == 'POST':
-        if request.content_type != 'application/json':
+    # if request.method == 'OPTIONS': 
+    #     return build_preflight_response()
+    # elif request.method == 'POST':
+    if request.content_type != 'application/json':
 
-            return jsonify('Error, Send the Data as Json')
+        return jsonify('Error, Send the Data as Json')
 
-        post_data = request.get_json()
-        name = post_data.get('name')
-        email = post_data.get('email')
-        message = post_data.get('message')
+    post_data = request.get_json()
+    name = post_data.get('name')
+    email = post_data.get('email')
+    message = post_data.get('message')
 
-        if name == None or name == "" or email == None or email == "" or message == None or message == "":
-            return json.dumps(str("Please provide a name, email and message to send email!")), 400
+    if name == None or name == "" or email == None or email == "" or message == None or message == "":
+        return json.dumps(str("Please provide a name, email and message to send email!")), 400
 
-        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-        from_email = Email("whiteknucklemr@gmail.com")
-        to_email = To("whiteknucklemr@gmail.com")
-        subject = f'Email from Wk Website {email}' 
-        content = Content("text/plain", f'{message} \n {email}')
-        mail = Mail(from_email, to_email, subject, content)
-        response = sg.send(message=mail)
-        response = build_actual_response(response)
-        print(response.status_code)
-        print(response.body)
-        print(response.headers)
-        return response
-
-def build_preflight_response():
-    response = make_response()
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers['Access-Control-Allow-Headers'] = "Content-Type"
-    response.headers['Access-Control-Allow-Methods'] = "POST, OPTIONS, GET, DELETE"
-    response.headers['Content-Type'] = "application/json"
+    sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+    from_email = Email("whiteknucklemr@gmail.com")
+    to_email = To("whiteknucklemr@gmail.com")
+    subject = f'Email from Wk Website {email}' 
+    content = Content("text/plain", f'{message} \n {email}')
+    mail = Mail(from_email, to_email, subject, content)
+    response = sg.send(message=mail)
+    # response = build_actual_response(response)
+    print(response.status_code)
+    print(response.body)
+    print(response.headers)
     return response
 
-def build_actual_response(response):
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers['Content-Type'] = "application/json"
-    return response
+# def build_preflight_response():
+#     response = make_response()
+#     response.headers["Access-Control-Allow-Origin"] = "*"
+#     response.headers['Access-Control-Allow-Headers'] = "Content-Type"
+#     response.headers['Access-Control-Allow-Methods'] = "POST, OPTIONS, GET, DELETE"
+#     response.headers['Content-Type'] = "application/json"
+#     return response
+
+# def build_actual_response(response):
+#     response.headers["Access-Control-Allow-Origin"] = "*"
+#     response.headers['Content-Type'] = "application/json"
+#     return response
 
 if __name__ == "__main__":
     app.run(debug=True)

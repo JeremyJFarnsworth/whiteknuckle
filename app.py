@@ -87,7 +87,7 @@ def handle_exception(e):
 
 
 @app.route("/send_email", methods=['OPTIONS','POST'])
-@cross_origin(["https://whiteknucklereact.vercel.app/"])
+@cross_origin(["https://whiteknucklereact.vercel.app"])
 def send_email():
     if request.method == 'OPTIONS': 
         return build_preflight_response()

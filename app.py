@@ -2,7 +2,7 @@ import json
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
-# from flask_cors import CORS, cross_origin
+from flask_cors import CORS, cross_origin
 import os
 import sys
 from sendgrid import SendGridAPIClient
@@ -10,8 +10,8 @@ from sendgrid.helpers.mail import *
 from werkzeug.exceptions import HTTPException
 
 app = Flask(__name__)
-# CORS(app)
-# app.config['CORS_HEADERS'] = 'Content-Type'
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "app.sqlite")
@@ -86,47 +86,45 @@ def handle_exception(e):
     return response
 
 
-@app.route("/send_email", methods=['POST'])
-# @cross_origin()
+@app.route("/send_email", methods=['OPTIONS','POST'])
+@cross_origin(["https://whiteknucklereact.vercel.app/"])
 def send_email():
-    # if request.method == 'OPTIONS': 
-    #     return build_preflight_response()
-    # elif request.method == 'POST':
-    if request.content_type != 'application/json':
+    if request.method == 'OPTIONS': 
+        return build_preflight_response()
+    elif request.method == 'POST':
+        if request.content_type != 'application/json':
 
-        return jsonify('Error, Send the Data as Json')
+            return jsonify('Error, Send the Data as Json')
 
-    post_data = request.get_json()
-    name = post_data.get('name')
-    email = post_data.get('email')
-    message = post_data.get('message')
+        post_data = request.get_json()
+        name = post_data.get('name')
+        email = post_data.get('email')
+        message = post_data.get('message')
+        
+        if name == None or name == "" or email == None or email == "" or message == None or message == "":
+            return json.dumps(str("Please provide a name, email and message to send email!")), 400
 
+        sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
+        from_email = Email("whiteknucklemr@gmail.com")
+        to_email = To("whiteknucklemr@gmail.com")
+        subject = f'Email from Wk Website {email}' 
+        content = Content("text/plain", f'{message} \n {email}')
+        mail = Mail(from_email, to_email, subject, content)
+        response = sg.send(message=mail)
+        response = build_actual_response(response)
+        print(response.status_code)
+        print(response.body)
+        print(response.headers)
+        print('Hello world!', file=sys.stderr)
+        return response
 
+def build_preflight_response():
+    response = make_response()
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
 
-
-    if name == None or name == "" or email == None or email == "" or message == None or message == "":
-        return json.dumps(str("Please provide a name, email and message to send email!")), 400
-
-    sg = SendGridAPIClient(api_key=os.environ.get('SENDGRID_API_KEY'))
-    from_email = Email("whiteknucklemr@gmail.com")
-    to_email = To("whiteknucklemr@gmail.com")
-    subject = f'Email from Wk Website {email}' 
-    content = Content("text/plain", f'{message} \n {email}')
-    mail = Mail(from_email, to_email, subject, content)
-    response = sg.send(message=mail)
-    print(response.status_code)
-    print(response.body)
-    print(response.headers)
-    print('Hello world!', file=sys.stderr)
-    return jsonify("successfully sent email")
-
-# def build_preflight_response():
-#     response = make_response()
-#     response.headers.add("Access-Control-Allow-Origin", "*")
-#     response.headers.add('Access-Control-Allow-Headers', "*")
-#     response.headers.add('Access-Control-Allow-Methods', "*")
-#     return response
-
-# def build_actual_response(response):
-#     response.headers.add("Access-Control-Allow-Origin", "*")
-#     return response
+def build_actual_response(response):
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    return response
